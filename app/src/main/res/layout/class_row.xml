@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:card_view="http://schemas.android.com/apk/res-auto"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_margin="5dp"
+card_view:cardCornerRadius="5dp"
+card_view:cardElevation="5dp">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/className"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:textStyle="bold"
+        android:text="bla"
+        android:gravity="center"
+        android:focusable="true"
+        android:textColor="#3F51B5"
+        android:textSize="18dp"
+        />
+    <TextView
+        android:text="bla"
+        android:id="@+id/classTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_below="@id/className"
+        android:gravity="center"
+        android:focusable="true"
+        android:textColor="@color/black"
+        android:textSize="16dp" />
+    <TextView
+        android:text="bla"
+        android:id="@+id/classTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_below="@id/classTitle"
+        android:gravity="center"
+        android:focusable="true"
+        android:textColor="@color/black"
+        android:textSize="16dp" />
+
+</RelativeLayout>
+</androidx.cardview.widget.CardView>
