@@ -17,6 +17,7 @@ public class PSubjectAdapter extends RecyclerView.Adapter<PSubjectAdapter.ViewHo
 
     private List<SubjectModel> subjects;
     private NewClassClickListener NewClassClickListener;
+    private int userId;
 
     public interface NewClassClickListener { //interface for the click listener
         void onNewClassClick(int subjectId);
@@ -24,7 +25,8 @@ public class PSubjectAdapter extends RecyclerView.Adapter<PSubjectAdapter.ViewHo
     public void setNewClassClickListener(PSubjectAdapter.NewClassClickListener listener) {
         this.NewClassClickListener = listener;
     }
-    public PSubjectAdapter(List<SubjectModel> subjects) {
+    public PSubjectAdapter(List<SubjectModel> subjects, int userId) {
+        this.userId = userId;
         this.subjects = subjects;
     }
     @NonNull
@@ -45,6 +47,7 @@ public class PSubjectAdapter extends RecyclerView.Adapter<PSubjectAdapter.ViewHo
                 Context context = holder.itemView.getContext();
                 Intent intent = new Intent(context, NewClassActivity.class);
                 intent.putExtra("SUBJECT_ID", subject.getId());
+                intent.putExtra("USER_ID", userId);
                 context.startActivity(intent);
             }
         });

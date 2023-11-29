@@ -59,7 +59,7 @@ public class ProfHomeScreenActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.subjectsList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        subjectAdapter = new PSubjectAdapter(subjects);
+        subjectAdapter = new PSubjectAdapter(subjects,userId);
         recyclerView.setAdapter(subjectAdapter);
         username = findViewById(R.id.username);
     }
