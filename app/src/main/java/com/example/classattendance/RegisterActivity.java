@@ -16,7 +16,6 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText surname;
     private EditText email;
     private EditText pass;
-    private RadioGroup radioGroupProfessor;
     private Button button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +57,6 @@ public class RegisterActivity extends AppCompatActivity {
                     DatabaseHandler databaseHandler=new DatabaseHandler(RegisterActivity.this);
                     boolean success = databaseHandler.RegisterUser(um);
                     Toast.makeText(RegisterActivity.this, "Success= "+success, Toast.LENGTH_SHORT).show();
-
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
                 }

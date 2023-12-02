@@ -20,7 +20,8 @@ public class NewClassActivity extends AppCompatActivity {
     private ImageButton buttonBack;
     private EditText areaTitle;
     private DatePicker datePicker;
-    private TimePicker timePicker;
+    private TimePicker timePickerStart;
+    private TimePicker timePickerEnd;
     private Button buttonSubmit;
     DatabaseHandler databaseHandler;
     private int subjectId;
@@ -33,7 +34,8 @@ public class NewClassActivity extends AppCompatActivity {
         buttonBack = findViewById(R.id.buttonBack);
         areaTitle = findViewById(R.id.areaTitle);
         datePicker = findViewById(R.id.datePicker);
-        timePicker = findViewById(R.id.timePicker);
+        timePickerStart = findViewById(R.id.timePickerStart);
+        timePickerEnd = findViewById(R.id.timePickerEnd);
         buttonSubmit = findViewById(R.id.buttonSubmit);
 
         databaseHandler = new DatabaseHandler(this);
@@ -60,19 +62,28 @@ public class NewClassActivity extends AppCompatActivity {
             Toast.makeText(this, "Enter a title.", Toast.LENGTH_SHORT).show();
             return;
         }
-        //get the selected date and time
+        //get the selected date and time for the class start
         int year = datePicker.getYear();
         int month = datePicker.getMonth();
         int day = datePicker.getDayOfMonth();
-        int hour = timePicker.getHour();
-        int minute = timePicker.getMinute();
+        int hour = timePickerStart.getHour();
+        int minute = timePickerStart.getMinute();
 
         Calendar calendar = Calendar.getInstance();
         calendar.set(year, month, day, hour, minute);
 
-        long timestamp = calendar.getTimeInMillis();
+        long start = calendar.getTimeInMillis();
+
+        //get the selected time for the class end
+        int hour1 = timePickerEnd.getHour();
+        int minute1 = timePickerEnd.getMinute();
+
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.set(year, month, day, hour1, minute1);
+
+        long end= calendar1.getTimeInMillis();
         if (subjectId != -1) {
-            boolean isAdded = databaseHandler.addClass(subjectId, title, timestamp);
+            boolean isAdded = databaseHandler.addClass(subjectId, title, start, end);
             if (isAdded==true) {
                 Toast.makeText(this, "Class added successfully", Toast.LENGTH_SHORT).show();
                 finish();

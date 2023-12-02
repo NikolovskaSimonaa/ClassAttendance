@@ -3,12 +3,14 @@ package com.example.classattendance;
 public class ClassModel {
     private int id;
     private String title;
-    private String timestamp;
+    private String startTimestamp;
+    private String endTimestamp;
 
-    public ClassModel(int id, String title, String timestamp) {
+    public ClassModel(int id, String title, String start, String end) {
         this.id = id;
         this.title = title;
-        this.timestamp = timestamp;
+        this.startTimestamp = start;
+        this.endTimestamp = end;
     }
 
     public ClassModel() {
@@ -26,10 +28,16 @@ public class ClassModel {
     public void setTitle(String title) {
         this.title = title;
     }
-    public String getTimestamp() {
-        return timestamp;
+    public String getStartTimestamp() {
+        return startTimestamp;
     }
-    public void setTimestamp(String t) {
-        this.timestamp = timestamp;
+    public void setStartTimestamp(String t) {
+        this.startTimestamp = t;
+    }
+    public String getEndTimestamp() {
+        return endTimestamp;
+    }
+    public void setEndTimestamp(String t) {
+        this.endTimestamp = t;
     }
 }

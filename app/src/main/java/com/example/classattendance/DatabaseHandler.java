@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -18,7 +19,7 @@ import java.util.List;
 public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME="dbClassAttendance.db";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     public static final String COLUMN_ID = "_id";
 
@@ -35,17 +36,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     private static final String TABLE_CLASSES="class";
     private static final String COLUMN_CLASS_TITLE="classTitle";
-    private static final String COLUMN_TIMESTAMP = "class_timestamp";
+    private static final String COLUMN_START_TIMESTAMP = "class_start_timestamp";
+    private static final String COLUMN_END_TIMESTAMP = "class_end_timestamp";
 
     public static final String TABLE_ATTENDANCE = "attendance";
     public static final String COLUMN_USER_ID = "user_id";
     public static final String COLUMN_SUBJECT_ID = "subject_id";
     public static final String COLUMN_CLASS_ID = "class_id";
-    public static final String COLUMN_DATE = "date";
-    public static final String COLUMN_ATTENDANCE_STATUS = "attendance_status";
 
     public static final String TABLE_USER_SUBJECT = "usersubject";
-
+    public static final String TABLE_SURVEY = "survey";
+    public static final String COLUMN_GRADE = "grade";
+    public static final String COLUMN_COMMENT = "comment";
     // Create tables
     private static final String CREATE_TABLE_USER = "CREATE TABLE " + TABLE_USER + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -64,7 +66,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_CLASSES = "CREATE TABLE " + TABLE_CLASSES + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_CLASS_TITLE + " TEXT,"
-            + COLUMN_TIMESTAMP + " TEXT,"
+            + COLUMN_START_TIMESTAMP+ " TEXT,"
+            + COLUMN_END_TIMESTAMP+ " TEXT,"
             + COLUMN_SUBJECT_ID + " INTEGER,"
             + " FOREIGN KEY (" + COLUMN_SUBJECT_ID + ") REFERENCES " + TABLE_SUBJECT + "(" + COLUMN_ID + ")"
             + ")";
@@ -73,8 +76,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
             + COLUMN_USER_ID + " INTEGER,"
             + COLUMN_CLASS_ID + " INTEGER,"
-            + COLUMN_DATE + " TEXT, "
-            + COLUMN_ATTENDANCE_STATUS + " TEXT DEFAULT 'false',"
             + " FOREIGN KEY (" + COLUMN_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_ID + "),"
             + " FOREIGN KEY (" + COLUMN_CLASS_ID + ") REFERENCES " + TABLE_CLASSES + "(" + COLUMN_ID + ")"
             + ")";
@@ -84,6 +85,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             + COLUMN_SUBJECT_ID + " INTEGER,"
             + COLUMN_USER_ID + " INTEGER,"
             + " FOREIGN KEY (" + COLUMN_SUBJECT_ID + ") REFERENCES " + TABLE_SUBJECT + "(" + COLUMN_ID + "),"
+            + " FOREIGN KEY (" + COLUMN_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_ID + ")"
+            + ")";
+
+    private static final String CREATE_TABLE_SURVEY = "CREATE TABLE " + TABLE_SURVEY + "("
+            + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+            + COLUMN_CLASS_ID + " INTEGER,"
+            + COLUMN_USER_ID + " INTEGER,"
+            + COLUMN_GRADE + " TEXT, "
+            + COLUMN_COMMENT + " TEXT,"
+            + " FOREIGN KEY (" + COLUMN_CLASS_ID + ") REFERENCES " + TABLE_CLASSES + "(" + COLUMN_ID + "),"
             + " FOREIGN KEY (" + COLUMN_USER_ID + ") REFERENCES " + TABLE_USER + "(" + COLUMN_ID + ")"
             + ")";
 
@@ -102,6 +113,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             db.execSQL(CREATE_TABLE_CLASSES);
             db.execSQL(CREATE_TABLE_ATTENDANCE);
             db.execSQL(CREATE_TABLE_USER_SUBJECT);
+            db.execSQL(CREATE_TABLE_SURVEY);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -113,6 +125,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CLASSES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ATTENDANCE);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER_SUBJECT);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SURVEY);
         onCreate(db);
     }
     @Override
@@ -211,7 +224,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     public Cursor getSubjects(){
-        SQLiteDatabase db=this.getWritableDatabase();
+        SQLiteDatabase db=this.getReadableDatabase();
         Cursor cursor=db.rawQuery("Select * from "+TABLE_SUBJECT, null);
         return cursor;
     }
@@ -259,12 +272,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         else  return false;
     }
 
-    public boolean addClass(int subjectId, String title, long timestamp){
+    public boolean addClass(int subjectId, String title, long start,long end){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();
         cv.put(COLUMN_SUBJECT_ID, subjectId);
         cv.put(COLUMN_CLASS_TITLE, title);
-        cv.put(COLUMN_TIMESTAMP, timestamp);
+        cv.put(COLUMN_START_TIMESTAMP, start);
+        cv.put(COLUMN_END_TIMESTAMP, end);
         long insert = db.insert(TABLE_CLASSES, null, cv);
         db.close();
         if(insert!=-1) return true;
@@ -294,7 +308,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         String query = "SELECT " +
                 TABLE_CLASSES + "." + COLUMN_CLASS_TITLE + ", " +
-                TABLE_CLASSES + "." + COLUMN_TIMESTAMP + ", " +
+                TABLE_CLASSES + "." + COLUMN_START_TIMESTAMP + ", " +
+                TABLE_CLASSES + "." + COLUMN_END_TIMESTAMP + ", " +
                 TABLE_CLASSES + "." + COLUMN_ID +
                 " FROM " + TABLE_CLASSES +
                 " JOIN " + TABLE_SUBJECT +
@@ -302,21 +317,55 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 " JOIN " + TABLE_USER_SUBJECT +
                 " ON " + TABLE_SUBJECT + "." + COLUMN_ID + " = " + TABLE_USER_SUBJECT + "." + COLUMN_SUBJECT_ID +
                 " WHERE " + TABLE_USER_SUBJECT + "." + COLUMN_USER_ID + " = ?"+
-                " ORDER BY " + TABLE_CLASSES + "." + COLUMN_TIMESTAMP + " ASC";
+                " ORDER BY " + TABLE_CLASSES + "." + COLUMN_START_TIMESTAMP + " ASC";
 
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex(COLUMN_CLASS_TITLE));
-                @SuppressLint("Range") String timestamp = cursor.getString(cursor.getColumnIndex(COLUMN_TIMESTAMP));
+                @SuppressLint("Range") String startTimestamp = cursor.getString(cursor.getColumnIndex(COLUMN_START_TIMESTAMP));
+                @SuppressLint("Range") String endTimestamp = cursor.getString(cursor.getColumnIndex(COLUMN_END_TIMESTAMP));
                 @SuppressLint("Range") int id=Integer.parseInt(cursor.getString(cursor.getColumnIndex(COLUMN_ID)));
-                ClassModel classModel = new ClassModel(id,title, timestamp);
+                ClassModel classModel = new ClassModel(id, title, startTimestamp, endTimestamp);
                 classes.add(classModel);
             } while (cursor.moveToNext());
             cursor.close();
         }
         db.close();
         return classes;
+    }
+    public boolean NewSurvey(SurveyModel sm,int userId, int classId){
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues cv=new ContentValues();
+
+        cv.put(COLUMN_GRADE, sm.getGrade());
+        cv.put(COLUMN_COMMENT,sm.getComment());
+        cv.put(COLUMN_USER_ID,userId);
+        cv.put(COLUMN_CLASS_ID,classId);
+
+        long insert=db.insert(TABLE_SURVEY,null,cv);
+        db.close();
+
+        if(insert==-1) return false;
+        else return true;
+    }
+    public boolean newAttendance(int userId, int classId){
+        SQLiteDatabase db=this.getWritableDatabase();
+
+        String query = "SELECT * FROM " + TABLE_ATTENDANCE +
+                " WHERE " + COLUMN_USER_ID + " = ? AND " + COLUMN_CLASS_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(classId)});
+
+        if (cursor != null && cursor.getCount() == 0) {
+            ContentValues cv = new ContentValues();
+            cv.put(COLUMN_USER_ID, userId);
+            cv.put(COLUMN_CLASS_ID, classId);
+            long result=db.insert(TABLE_ATTENDANCE, null, cv);
+            cursor.close();
+            db.close();
+            if(result!=-1) return true;
+            else  return false;
+        } else return true;
     }
 }

@@ -24,6 +24,7 @@ public class ProfHomeScreenActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private PSubjectAdapter subjectAdapter;
     private Button buttonNewSubject;
+    private Button buttonLogout;
     private TextView username;
     private DatabaseHandler databaseHandler;
     @Override
@@ -46,6 +47,15 @@ public class ProfHomeScreenActivity extends AppCompatActivity {
         } else {
             username.setText("Invalid user ID");
         }
+        buttonLogout = findViewById(R.id.buttonLogout);
+        buttonLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+
+            }
+        });
         buttonNewSubject = findViewById(R.id.buttonNewSubject);
         buttonNewSubject.setOnClickListener(new View.OnClickListener() {
             @Override
