@@ -172,7 +172,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         info.close();
         return userId;
-
     }
     @SuppressLint("Range")
     public Boolean checkIsProfessor(String email, String password){
@@ -232,7 +231,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     @SuppressLint("Range")
     public ClassModel getClassById(int classId) {
         SQLiteDatabase db=this.getReadableDatabase();
-        String[] columns={COLUMN_ID, COLUMN_CLASS_TITLE};
+        String[] columns={COLUMN_ID, COLUMN_CLASS_TITLE,COLUMN_START_TIMESTAMP,COLUMN_END_TIMESTAMP};
         String selection=COLUMN_ID + " = ?";
         String[] selectionArgs={String.valueOf(classId)};
         Cursor cursor=db.query(TABLE_CLASSES, columns, selection, selectionArgs, null, null, null);
@@ -242,6 +241,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             c = new ClassModel();
             c.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
             c.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_CLASS_TITLE)));
+            c.setStartTimestamp(cursor.getString(cursor.getColumnIndex(COLUMN_START_TIMESTAMP)));
+            c.setEndTimestamp(cursor.getString(cursor.getColumnIndex(COLUMN_END_TIMESTAMP)));
             cursor.close();
         }
         db.close();
@@ -456,5 +457,45 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         db.close();
         return students;
+    }
+    public List<SurveyModel> getSurveysForClass(int classId){
+        List<SurveyModel> answers = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + TABLE_SURVEY + "." + COLUMN_ID + ", " +
+                TABLE_SURVEY+ "." + COLUMN_GRADE + ", " +
+                TABLE_SURVEY+ "." + COLUMN_COMMENT +
+                " FROM " + TABLE_SURVEY +
+                " WHERE " + TABLE_SURVEY + "." + COLUMN_CLASS_ID + " = ?";
+        Cursor cursor=db.rawQuery(query, new String[]{String.valueOf(classId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex(DatabaseHandler.COLUMN_ID));
+                @SuppressLint("Range") String grade = cursor.getString(cursor.getColumnIndex(DatabaseHandler.COLUMN_GRADE));
+                @SuppressLint("Range") String comment = cursor.getString(cursor.getColumnIndex(DatabaseHandler.COLUMN_COMMENT));
+
+                SurveyModel survey = new SurveyModel(id,grade,comment);
+                answers.add(survey);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return answers;
+    }
+    public Boolean checkAttendance(int userId,int classId){
+        SQLiteDatabase info=this.getReadableDatabase();
+        String[] columns={COLUMN_ID};
+        String selection=COLUMN_USER_ID + " = ?" + " AND " + COLUMN_CLASS_ID + " = ?";
+        String[] selectionArgs={String.valueOf(userId), String.valueOf(classId)};
+
+        Cursor cursor=info.query(TABLE_ATTENDANCE, columns, selection, selectionArgs, null, null, null);
+        boolean attendance=false;
+
+        if (cursor!=null && cursor.moveToFirst()) {
+            attendance=true;
+            cursor.close();
+        }
+        info.close();
+        return attendance;
     }
 }

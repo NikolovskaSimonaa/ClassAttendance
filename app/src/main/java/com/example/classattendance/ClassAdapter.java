@@ -3,6 +3,7 @@ package com.example.classattendance;
 import static android.content.Intent.getIntent;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +47,11 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
         int classState=classState(currentClass.getStartTimestamp(), currentClass.getEndTimestamp());
         int locationState=locationState();
         if(classState==1 && locationState==1) holder.buttonAttendance.setEnabled(true);
-
+        if(classState==2){ // the current class ended
+            if(databaseHandler.checkAttendance(userId,currentClass.getId())) {
+                holder.buttonSurvey.setEnabled(true);
+            }
+        }
         holder.buttonAttendance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,8 +61,20 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
                 }
             }
         });
+        holder.buttonSurvey.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //this function will not be called if the button is not enabled ,but I've added this check below for a better code flow
+                if (holder.buttonSurvey.isEnabled()) {
+                    Context context=v.getContext();
+                    Intent intent=new Intent(context, SurveyActivity.class);
+                    intent.putExtra("USER_ID", userId);
+                    intent.putExtra("CLASS_ID", currentClass.getId());
+                    context.startActivity(intent);
+                }
+            }
+        });
     }
-
 
     @Override
     public int getItemCount() {
@@ -68,6 +85,7 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
         TextView title;
         TextView time;
         Button buttonAttendance;
+        Button buttonSurvey;
         int userId,classId;
         public ClassViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -75,6 +93,7 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
             title = itemView.findViewById(R.id.classTitle);
             time = itemView.findViewById(R.id.classTime);
             buttonAttendance = itemView.findViewById(R.id.buttonAttendance);
+            buttonSurvey = itemView.findViewById(R.id.buttonSurvey);
         }
     }
     private String formatDateAndTime(String timestamp) {
@@ -90,8 +109,10 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
         long currentTime=System.currentTimeMillis();
         long start = Long.parseLong(startTime);
         long end = Long.parseLong(endTime);
-        if (currentTime >= start && currentTime <= end) return 1;
-        else return 0; // 0 - you are too soon or too late for your attendance to be recorded
+        if (currentTime >= start && currentTime <= end) return 1; //1 - you are on time
+        else if (currentTime < start) return 0; // 0 - you are too soon for your attendance to be recorded
+        else return 2; // 2 - you are too late for your attendance to be recorded, or if the student attended the class,
+                       // the button for filling the survey form will be enabled.
     }
 
     private int locationState() {

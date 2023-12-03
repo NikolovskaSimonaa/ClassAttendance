@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String email = editTextEmail.getText().toString().trim();
                 String pass = editTextPassword.getText().toString().trim();
-                if (email.isEmpty() && pass.isEmpty()) {
+                if (email.isEmpty() || pass.isEmpty()) {
                     Toast.makeText(MainActivity.this, "Please fill in all the fields", Toast.LENGTH_SHORT).show();
                 } else {
                     Boolean checkemail=db.checkEmail(email);

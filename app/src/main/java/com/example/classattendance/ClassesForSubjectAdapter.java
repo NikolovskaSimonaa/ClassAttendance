@@ -59,7 +59,6 @@ public class ClassesForSubjectAdapter extends RecyclerView.Adapter<ClassesForSub
                     intent.putExtra("USER_ID", userId);
                     intent.putExtra("SUBJECT_ID", subjectId);
                     intent.putExtra("CLASS_ID", c.getId());
-
                     context.startActivity(intent);
                 }
             });

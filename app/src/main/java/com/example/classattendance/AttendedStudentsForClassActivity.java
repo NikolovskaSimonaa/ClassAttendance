@@ -7,8 +7,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ public class AttendedStudentsForClassActivity extends AppCompatActivity {
     private AttendedUserAdapter studentAdapter;
     private TextView className;
     private ImageButton back;
+    private Button buttonSeeSurveyAnswers;
+    private ClassModel c;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +46,7 @@ public class AttendedStudentsForClassActivity extends AppCompatActivity {
             subjectName.setText("Invalid subject ID");
         }
         if (classId != -1) {
-            ClassModel c = databaseHandler.getClassById(classId);
+            c = databaseHandler.getClassById(classId);
             List<UserModel> students = databaseHandler.getAttendedStudentsForClass(classId);
             recyclerView = findViewById(R.id.studentsList);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -67,5 +71,25 @@ public class AttendedStudentsForClassActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        buttonSeeSurveyAnswers= findViewById(R.id.buttonSeeSurveyAnswers);
+        if(System.currentTimeMillis() < Long.parseLong(c.getEndTimestamp())) {
+            buttonSeeSurveyAnswers.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Toast.makeText(getApplicationContext(), "You can't see the answers until the class is finished", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            buttonSeeSurveyAnswers.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getApplicationContext(), SurveyAnswersForClassActivity.class);
+                    intent.putExtra("USER_ID", userId);
+                    intent.putExtra("SUBJECT_ID", subjectId);
+                    intent.putExtra("CLASS_ID", c.getId());
+                    startActivity(intent);
+                }
+            });
+        }
     }
 }

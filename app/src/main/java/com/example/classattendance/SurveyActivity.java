@@ -59,6 +59,7 @@ public class SurveyActivity extends AppCompatActivity {
                     boolean success = databaseHandler.NewSurvey(sm, userId, classId);
                     Toast.makeText(SurveyActivity.this, "Success= "+success, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), StudentHomeScreenActivity.class);
+                    intent.putExtra("USER_ID", userId);
                     startActivity(intent);
                 }
             }

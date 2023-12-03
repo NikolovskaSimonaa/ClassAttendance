@@ -44,7 +44,7 @@ public class MyCalendarActivity extends AppCompatActivity {
         if(classes==null){
             Toast.makeText(MyCalendarActivity.this, "You don't have any classes", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getApplicationContext(), StudentHomeScreenActivity.class);
-            intent.putExtra("USER_ID", userId); //pass the signed user_id to the home screen
+            intent.putExtra("USER_ID", userId);
             startActivity(intent);
         }else {
             classAdapter = new ClassAdapter(this, classes, databaseHandler,userId);

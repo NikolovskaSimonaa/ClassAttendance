@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AttendedStudentsForClassActivity">
+    tools:context=".SurveyAnswersForClassActivity">
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -33,6 +34,14 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:layout_centerVertical="true"/>
+                <TextView
+                    android:id="@+id/toolbarTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Survey answers"
+                    android:textColor="@android:color/white"
+                    android:textSize="20dp"
+                    android:layout_centerInParent="true"/>
             </RelativeLayout>
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -94,21 +103,6 @@
         app:layout_constraintStart_toEndOf="@+id/c"
         app:layout_constraintTop_toBottomOf="@id/subjectName" />
 
-    <Button
-        android:id="@+id/buttonSeeSurveyAnswers"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:text="See survey answers"
-        android:backgroundTint="#3F51B5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/c"
-        android:textSize="16sp"
-        android:padding="12dp" />
-
     <TextView
         android:id="@+id/textViewConfirmAttendance"
         android:layout_width="match_parent"
@@ -116,12 +110,12 @@
         android:layout_centerInParent="true"
         android:layout_marginLeft="16dp"
         android:gravity="center_vertical"
-        android:text="Confirmed attendance by:"
+        android:text="Class rating from the participants:"
         android:textStyle="italic"
         android:textColor="@color/black"
         android:textSize="21dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/buttonSeeSurveyAnswers" />
+        app:layout_constraintTop_toBottomOf="@id/className" />
 
     <View
         android:id="@+id/line"
@@ -134,7 +128,7 @@
         android:background="#57818181"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/studentsList"
+        android:id="@+id/answerList"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"

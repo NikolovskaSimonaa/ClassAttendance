@@ -16,6 +16,9 @@
         android:theme="@style/Theme.ClassAttendance"
         tools:targetApi="31">
         <activity
+            android:name=".SurveyAnswersForClassActivity"
+            android:exported="false" />
+        <activity
             android:name=".AttendedStudentsForClassActivity"
             android:exported="false" />
         <activity
