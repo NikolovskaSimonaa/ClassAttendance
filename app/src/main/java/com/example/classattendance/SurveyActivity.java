@@ -16,6 +16,7 @@ public class SurveyActivity extends AppCompatActivity {
     private TextView areaClass;
     private Button submitb;
     private EditText areaComment;
+    DatabaseHandler databaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,17 @@ public class SurveyActivity extends AppCompatActivity {
         areaClass = findViewById(R.id.areaClass);
         submitb= findViewById(R.id.submitb);
         areaComment = findViewById(R.id.areaComment);
+        databaseHandler=new DatabaseHandler(SurveyActivity.this);
+        if (classId!= -1) {
+            ClassModel c = databaseHandler.getClassById(classId);
+            if (c != null) {
+                areaClass.setText(c.getTitle());
+            } else {
+                areaClass.setText("Class not found.");
+            }
+        } else {
+            areaClass.setText("Invalid class ID");
+        }
         RadioButton radiob1 = findViewById(R.id.radiob1);
         RadioButton radiob2 = findViewById(R.id.radiob2);
         RadioButton radiob3 = findViewById(R.id.radiob3);
