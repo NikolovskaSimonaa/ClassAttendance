@@ -209,7 +209,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return user;
     }
-
     @SuppressLint("Range")
     public SubjectModel getSubjectById(int subjectId) {
         SQLiteDatabase db=this.getReadableDatabase();
@@ -248,7 +247,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return c;
     }
-
     public boolean AddSubject(SubjectModel sm){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();
@@ -260,7 +258,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if(insert==-1) return false;
         else return true;
     }
-
     public Cursor getSubjects(){
         SQLiteDatabase db=this.getReadableDatabase();
         Cursor cursor=db.rawQuery("Select * from "+TABLE_SUBJECT, null);
@@ -292,7 +289,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         return classes;
     }
-
     public Cursor getSubjectsForUser(int userId){
         SQLiteDatabase db=this.getReadableDatabase();
         String query = "SELECT " + TABLE_SUBJECT + "." + COLUMN_ID + ", " +
@@ -324,7 +320,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
         return cursor;
     }
-
     public boolean enrollUserInSubject(int userId, int subjectId){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();
