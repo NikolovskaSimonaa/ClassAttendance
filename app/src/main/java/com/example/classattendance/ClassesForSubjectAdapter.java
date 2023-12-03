@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -42,19 +43,28 @@ public class ClassesForSubjectAdapter extends RecyclerView.Adapter<ClassesForSub
         holder.title.setText(c.getTitle());
         String formattedStartDateTime = formatDateAndTime(c.getStartTimestamp());
         holder.time.setText(formattedStartDateTime);
+        if(Long.parseLong(c.getStartTimestamp()) > System.currentTimeMillis()){
+            holder.buttonAttendance.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(context, "The class isn't started yet", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }else{
+            holder.buttonAttendance.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Context context=v.getContext();
+                    Intent intent=new Intent(context, AttendedStudentsForClassActivity.class);
+                    intent.putExtra("USER_ID", userId);
+                    intent.putExtra("SUBJECT_ID", subjectId);
+                    intent.putExtra("CLASS_ID", c.getId());
 
-        holder.buttonAttendance.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context=v.getContext();
-                Intent intent=new Intent(context, AttendedStudentsForClassActivity.class);
-                intent.putExtra("USER_ID", userId);
-                intent.putExtra("SUBJECT_ID", subjectId);
-                intent.putExtra("CLASS_ID", c.getId());
+                    context.startActivity(intent);
+                }
+            });
+        }
 
-                context.startActivity(intent);
-            }
-        });
     }
 
     @Override
