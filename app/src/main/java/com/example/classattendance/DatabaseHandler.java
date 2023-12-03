@@ -211,6 +211,43 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return user;
     }
 
+    @SuppressLint("Range")
+    public SubjectModel getSubjectById(int subjectId) {
+        SQLiteDatabase db=this.getReadableDatabase();
+        String[] columns={COLUMN_ID, COLUMN_SUBJECT_NAME};
+        String selection=COLUMN_ID + " = ?";
+        String[] selectionArgs={String.valueOf(subjectId)};
+        Cursor cursor=db.query(TABLE_SUBJECT, columns, selection, selectionArgs, null, null, null);
+        SubjectModel s=null;
+        if (cursor!=null && cursor.moveToFirst()) {
+
+            s = new SubjectModel();
+            s.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
+            s.setName(cursor.getString(cursor.getColumnIndex(COLUMN_SUBJECT_NAME)));
+            cursor.close();
+        }
+        db.close();
+        return s;
+    }
+    @SuppressLint("Range")
+    public ClassModel getClassById(int classId) {
+        SQLiteDatabase db=this.getReadableDatabase();
+        String[] columns={COLUMN_ID, COLUMN_CLASS_TITLE};
+        String selection=COLUMN_ID + " = ?";
+        String[] selectionArgs={String.valueOf(classId)};
+        Cursor cursor=db.query(TABLE_CLASSES, columns, selection, selectionArgs, null, null, null);
+        ClassModel c=null;
+        if (cursor!=null && cursor.moveToFirst()) {
+
+            c = new ClassModel();
+            c.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_ID)));
+            c.setTitle(cursor.getString(cursor.getColumnIndex(COLUMN_CLASS_TITLE)));
+            cursor.close();
+        }
+        db.close();
+        return c;
+    }
+
     public boolean AddSubject(SubjectModel sm){
         SQLiteDatabase db=this.getWritableDatabase();
         ContentValues cv=new ContentValues();
@@ -227,6 +264,32 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db=this.getReadableDatabase();
         Cursor cursor=db.rawQuery("Select * from "+TABLE_SUBJECT, null);
         return cursor;
+    }
+    public List<ClassModel> getClassesForSubject(int subjectId) {
+        List<ClassModel> classes = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " +
+                TABLE_CLASSES + "." + COLUMN_CLASS_TITLE + ", " +
+                TABLE_CLASSES + "." + COLUMN_START_TIMESTAMP + ", " +
+                TABLE_CLASSES + "." + COLUMN_END_TIMESTAMP + ", " +
+                TABLE_CLASSES + "." + COLUMN_ID +
+                " FROM " + TABLE_CLASSES +
+                " WHERE " + TABLE_CLASSES + "." + COLUMN_SUBJECT_ID + " = ?"+
+                " ORDER BY " + TABLE_CLASSES + "." + COLUMN_START_TIMESTAMP + " ASC";
+        Cursor cursor=db.rawQuery(query, new String[]{String.valueOf(subjectId)});
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex(COLUMN_CLASS_TITLE));
+                @SuppressLint("Range") String startTimestamp = cursor.getString(cursor.getColumnIndex(COLUMN_START_TIMESTAMP));
+                @SuppressLint("Range") String endTimestamp = cursor.getString(cursor.getColumnIndex(COLUMN_END_TIMESTAMP));
+                @SuppressLint("Range") int id=Integer.parseInt(cursor.getString(cursor.getColumnIndex(COLUMN_ID)));
+                ClassModel classModel = new ClassModel(id, title, startTimestamp, endTimestamp);
+                classes.add(classModel);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return classes;
     }
 
     public Cursor getSubjectsForUser(int userId){
@@ -367,5 +430,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             if(result!=-1) return true;
             else  return false;
         } else return true;
+    }
+    public List<UserModel>getAttendedStudentsForClass(int classId){
+        List<UserModel> students = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT " + TABLE_USER + "." + COLUMN_ID + ", " +
+                TABLE_USER+ "." + COLUMN_NAME + ", " +
+                TABLE_USER+ "." + COLUMN_SURNAME +
+                " FROM " + TABLE_USER +
+                " JOIN " + TABLE_ATTENDANCE +
+                " ON " + TABLE_USER + "." + COLUMN_ID + " = " + TABLE_ATTENDANCE + "." + COLUMN_USER_ID +
+                " WHERE " + TABLE_ATTENDANCE + "." + COLUMN_CLASS_ID + " = ?";
+        Cursor cursor=db.rawQuery(query, new String[]{String.valueOf(classId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") int id = cursor.getInt(cursor.getColumnIndex(DatabaseHandler.COLUMN_ID));
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(DatabaseHandler.COLUMN_NAME));
+                @SuppressLint("Range") String surname = cursor.getString(cursor.getColumnIndex(DatabaseHandler.COLUMN_SURNAME));
+
+                UserModel user = new UserModel(id,name,surname,null,null,null);
+                students.add(user);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        db.close();
+        return students;
     }
 }

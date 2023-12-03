@@ -51,6 +51,16 @@ public class PSubjectAdapter extends RecyclerView.Adapter<PSubjectAdapter.ViewHo
                 context.startActivity(intent);
             }
         });
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Context context=view.getContext();
+                Intent intent=new Intent(context, ClassesForSubjectActivity.class);
+                intent.putExtra("SUBJECT_ID", subject.getId());
+                intent.putExtra("USER_ID", userId);
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
