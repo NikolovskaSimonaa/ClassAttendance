@@ -45,8 +45,7 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
         holder.time.setText(formattedStartDateTime);
 
         int classState=classState(currentClass.getStartTimestamp(), currentClass.getEndTimestamp());
-        int locationState=locationState();
-        if(classState==1 && locationState==1) holder.buttonAttendance.setEnabled(true);
+        if(classState==1) holder.buttonAttendance.setEnabled(true);
         if(classState==2){ // the current class ended
             if(databaseHandler.checkAttendance(userId,currentClass.getId())) {
                 holder.buttonSurvey.setEnabled(true);
@@ -58,6 +57,7 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
                 //this function will not be called if the button is not enabled ,but I've added this check below for a better code flow
                 if (holder.buttonAttendance.isEnabled()) {
                     databaseHandler.newAttendance(userId, currentClass.getId());
+                    Toast.makeText(context, "Attendance recorded", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -113,13 +113,5 @@ public class ClassAdapter extends RecyclerView.Adapter<ClassAdapter.ClassViewHol
         else if (currentTime < start) return 0; // 0 - you are too soon for your attendance to be recorded
         else return 2; // 2 - you are too late for your attendance to be recorded, or if the student attended the class,
                        // the button for filling the survey form will be enabled.
-    }
-
-    private int locationState() {
-        //TODO: implement this function
-        int loc = 1;
-
-        if (loc == 1) return 1; //location confirmation for the student
-        else return 0; //the student location is not accepted for attendance
     }
 }

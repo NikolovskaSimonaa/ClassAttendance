@@ -46,19 +46,23 @@ public class RegisterActivity extends AppCompatActivity {
                 if (e.isEmpty() && p.isEmpty() && n.isEmpty() && s.isEmpty()) {
                     Toast.makeText(RegisterActivity.this, "In order to register fill in all the fields", Toast.LENGTH_SHORT).show();
                 } else {
-                    try{
-                        um = new UserModel(-1, name.getText().toString(), surname.getText().toString(),isProfessor, email.getText().toString(), pass.getText().toString());
-                        Toast.makeText(RegisterActivity.this, "User added successfully.", Toast.LENGTH_SHORT).show();
-                    } catch(Exception exception) {
-                        Toast.makeText(RegisterActivity.this, "Error creating user,try again.", Toast.LENGTH_SHORT).show();
-                        um = new UserModel(-1, "error", "error", "error", "error", "error");
-                    }
-
                     DatabaseHandler databaseHandler=new DatabaseHandler(RegisterActivity.this);
-                    boolean success = databaseHandler.RegisterUser(um);
-                    Toast.makeText(RegisterActivity.this, "Success= "+success, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
+                    if(databaseHandler.checkEmail(e)==true){
+                        Toast.makeText(RegisterActivity.this, "User already exists.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        try {
+                            um = new UserModel(-1, name.getText().toString(), surname.getText().toString(), isProfessor, email.getText().toString(), pass.getText().toString());
+                            boolean success = databaseHandler.RegisterUser(um);
+                            if(success){
+                                Toast.makeText(RegisterActivity.this, "User added successfully.", Toast.LENGTH_SHORT).show();
+                            }
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                        } catch (Exception exception) {
+                            Toast.makeText(RegisterActivity.this, "Error creating user,try again.", Toast.LENGTH_SHORT).show();
+                            um = new UserModel(-1, "error", "error", "error", "error", "error");
+                        }
+                    }
                 }
             }
         });
